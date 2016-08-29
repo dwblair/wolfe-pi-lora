@@ -101,7 +101,8 @@ void loop()
   root["millis"] = millis();
   JsonObject& data = root.createNestedObject("data");
   //data["vbat"] = double_with_n_digits(measuredvbat, 3);
-  data["vbat"] = analogRead(A0);
+  data["temp"] = analogRead(A0);
+  data["humid"] = analogRead(A1);
 
   char buf[251];
   root.printTo(buf, sizeof(buf));
@@ -143,6 +144,8 @@ void loop()
     digitalWrite(LED, LOW);
 
   //delay(8000);
+  for (int i=0;i<8;i++) {
   LowPower.powerDown(SLEEP_8S, ADC_OFF, BOD_OFF);  
+  }
   
 }

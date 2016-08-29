@@ -1,6 +1,7 @@
 import serial
 import requests
 import time
+import json
 
 #### some basic variables
 
@@ -8,14 +9,15 @@ import time
 baseURL = 'http://159.203.128.53'
 #baseURL = 'https://data.sparkfun.com'
 
-publicKey='KjqJ8gpeq1hzKlJjqm0KFPMGEVN'
-privateKey='A9ypzYrKyATn7vg30OW7IGpzL3d'
+publicKey='D48m6lJVVGCJ0k41pbA0fxpQ8w6'
+privateKey='z98lmbO665sglxzZmYqlHegqwAQ'
 
 serialPort="/dev/ttyACM0"
+serialPort="/dev/ttyUSB0"
 
 serialBaud = 9600
 
-loopDelay = 9 #seconds
+loopDelay = 10 #seconds
 
 endl="\n"
 
@@ -43,9 +45,9 @@ def postPhant(line):
 
 ser = serial.Serial(serialPort, serialBaud)
 
-print "Waiting for serial port ..."
+#print "Waiting for serial port ..."
 time.sleep(3)
-ser.flush() # flush to ge rid of extraneous char
+#ser.flush() # flush to get rid of extraneous char
 
 print "\n"
 
@@ -56,18 +58,50 @@ while True:
     #cmd = "READ"
     #cmd = cmd.strip() + endl
     #ser.write(cmd.encode())
+    print "Waiting for serial port ..."
+    
     line = ser.readline()
     line=line.decode('utf-8')
     
-    print 'raw serial input: ', line.strip()
+    #print 'raw serial input: ', line.strip()
   
     parsed = line.split('\t')
     
-    rssi=parsed[0].split(':')[1]
+    if len(parsed) == 2:
+    
+        rssi=parsed[0].split(':')[1]
 
-    json = parsed[1]
+        j = str(parsed[1])
 
-    print 'rssi='+str(rssi)+" json="+json
+        #print 'rssi='+str(rssi)+" json="+j
+        
+        p = json.loads(j)
+    
+        id = str(p["id"])
+        rssi = str(rssi)
+        temp = str(p["data"]["temp"])
+        humid = str(p["data"]["humid"])
+        
+        print "\n"
+            
+        print "id="+id
+        print "rssi="+rssi
+        print "temp="+temp
+        print "humid="+humid
+        
+
+        pushUrl = baseURL+'/input/'+str(publicKey)+'?private_key='+str(privateKey)+'&id='+id+'&temp='+temp+'&humid='+humid
+         
+        print pushUrl
+         
+        push = requests.get(pushUrl)
+        
+        print push
+        
+        print "wait after posting ..."
+        
+        time.sleep(loopDelay)
+        
 
     # post to Phant
     #status = postPhant(line)
@@ -75,7 +109,7 @@ while True:
     
     #print "waiting " + str(loopDelay) + " seconds til next read. "
     
-    print "\n"
+
     
     #time.sleep(loopDelay)
     

@@ -9,38 +9,21 @@
 #include <SPI.h>
 #include <RH_RF95.h>
 
-/* for feather32u4 
-#define RFM95_CS 8
-#define RFM95_RST 4
-#define RFM95_INT 7
-*/
-
-// for feather m0  
-#define RFM95_CS 8
-#define RFM95_RST 4
-#define RFM95_INT 3
-
-
-/* for shield 
-#define RFM95_CS 10
-#define RFM95_RST 9
-#define RFM95_INT 7
-*/
 
 // Change to 434.0 or other frequency, must match RX's freq!
 #define RF95_FREQ 868.0
 
 // Singleton instance of the radio driver
-RH_RF95 rf95(RFM95_CS, RFM95_INT);
+RH_RF95 rf95;
 
 // Blinky on receipt
-#define LED 13
+#define LED 9
 
 void setup() 
 {
   pinMode(LED, OUTPUT);     
-  pinMode(RFM95_RST, OUTPUT);
-  digitalWrite(RFM95_RST, HIGH);
+//  pinMode(RFM95_RST, OUTPUT);
+//  digitalWrite(RFM95_RST, HIGH);
 
   while (!Serial);
   Serial.begin(9600);
@@ -49,10 +32,10 @@ void setup()
   //Serial.println("Feather LoRa RX Test!");
   
   // manual reset
-  digitalWrite(RFM95_RST, LOW);
-  delay(10);
-  digitalWrite(RFM95_RST, HIGH);
-  delay(10);
+  //digitalWrite(RFM95_RST, LOW);
+  //delay(10);
+  //digitalWrite(RFM95_RST, HIGH);
+  //delay(10);
 
   while (!rf95.init()) {
     //Serial.println("LoRa radio init failed");
@@ -86,7 +69,7 @@ void loop()
     
     if (rf95.recv(buf, &len))
     {
-      digitalWrite(LED, HIGH);
+      
       //RH_RF95::printBuffer("Received: ", buf, len);   
 
       Serial.print("RSSI: ");

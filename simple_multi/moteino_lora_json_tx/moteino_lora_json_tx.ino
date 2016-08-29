@@ -15,7 +15,7 @@
 #include <ArduinoJson.h>
 
 // Device ID
-#define DEVID 1
+#define DEVID 3
 
 /*
  SLEEP_15MS,

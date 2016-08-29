@@ -79,7 +79,10 @@ void loop()
       
       Serial.println((char*)buf);
      
-      
+
+      digitalWrite(LED,HIGH);
+    delay(200);
+    digitalWrite(LED, LOW);
 
       /*
       // Send a reply

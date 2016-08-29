@@ -86,7 +86,6 @@ int16_t packetnum = 0;  // packet counter, we increment per xmission
  
 void loop()
 { 
-  digitalWrite(LED, HIGH);
   Serial.println("Sending to rf95_server");
 
   float measuredvbat = analogRead(VBATPIN);
@@ -141,7 +140,10 @@ void loop()
   }
 */
 
+    digitalWrite(LED,HIGH);
+    delay(200);
     digitalWrite(LED, LOW);
+    
 
   //delay(8000);
   for (int i=0;i<8;i++) {

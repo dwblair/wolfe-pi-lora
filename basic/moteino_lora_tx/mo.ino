@@ -11,33 +11,23 @@
  
 #include <SPI.h>
 #include <RH_RF95.h>
- 
-/* for feather32u4
-#define RFM95_CS 8
-#define RFM95_RST 4
-#define RFM95_INT 7
+#include "LowPower.h"
+
+/*
+ SLEEP_15MS,
+ SLEEP_30MS, 
+  SLEEP_60MS,
+  SLEEP_120MS,
+  SLEEP_250MS,
+  SLEEP_500MS,
+  SLEEP_1S,
+  SLEEP_2S,
+  SLEEP_4S,
+  SLEEP_8S,
+  SLEEP_FOREVER
 */
+  
 
-/* for feather m0 
-#define RFM95_CS 8
-#define RFM95_RST 4
-#define RFM95_INT 3
-*/
-
-/* for shield 
-#define RFM95_CS 10
-#define RFM95_RST 9
-#define RFM95_INT 7
-*/
-
-/* for moteino
-#define RFM95_CS 10
-#define RFM95_RST 4
-#define RFM95_INT 5
-*/
-
-
- 
 // Change to 434.0 or other frequency, must match RX's freq!
 //#define RF95_FREQ 915.0
 #define RF95_FREQ 868.0
@@ -64,13 +54,7 @@ void setup()
   Serial.begin(9600);
   delay(100);
  
-  Serial.println("Feather LoRa TX Test!");
- 
-  // manual reset
-  //digitalWrite(RFM95_RST, LOW);
-  //delay(10);
-  //digitalWrite(RFM95_RST, HIGH);
-  //delay(10);
+  Serial.println(" LoRa TX Test!");
  
   while (!rf95.init()) {
     Serial.println("LoRa radio init failed");
@@ -126,4 +110,7 @@ void loop()
   delay(500);
   digitalWrite(LED, LOW);
   delay(500);
+
+  LowPower.powerDown(SLEEP_8S, ADC_OFF, BOD_OFF);  
+  
 }

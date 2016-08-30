@@ -42,7 +42,7 @@ void setup()
   pinMode(RFM95_RST, OUTPUT);
   digitalWrite(RFM95_RST, HIGH);
 
-  while (!Serial);
+  //while (!Serial);
   Serial.begin(9600);
   delay(100);
 
@@ -97,7 +97,9 @@ void loop()
       Serial.println((char*)buf);
      
       
-
+      digitalWrite(LED,HIGH);
+    delay(200);
+    digitalWrite(LED, LOW);
       /*
       // Send a reply
       uint8_t data[] = "And hello back to you";

@@ -173,6 +173,8 @@ void loop()
   //data["vbat"] = double_with_n_digits(measuredvbat, 3);
   data["temp"] = double_with_n_digits(temp,2);
   data["humid"] = analogRead(A1);
+  data["press"] = analogRead(A2);
+  data["other"] = analogRead(A3);
 
   char buf[251];
   root.printTo(buf, sizeof(buf));

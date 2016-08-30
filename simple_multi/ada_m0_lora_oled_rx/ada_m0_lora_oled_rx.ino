@@ -129,6 +129,9 @@ void loop()
   display.setTextColor(WHITE);
   display.setCursor(10,0);
   display.clearDisplay();
+  display.print("RS:");
+  display.print(rf95.lastRssi(),DEC);
+  display.print(",");
   display.println((char*)buf);
   display.display();
       

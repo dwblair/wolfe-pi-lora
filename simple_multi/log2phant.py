@@ -63,7 +63,7 @@ while True:
     line = ser.readline()
     line=line.decode('utf-8')
     
-    #print 'raw serial input: ', line.strip()
+    print 'raw serial input: ', line.strip()
   
     parsed = line.split('\t')
     
@@ -80,17 +80,17 @@ while True:
         id = str(p["id"])
         rssi = str(rssi)
         temp = str(p["data"]["temp"])
-        humid = str(p["data"]["humid"])
+        vbat = str(p["data"]["vbat"])
         
         print "\n"
             
         print "id="+id
         print "rssi="+rssi
         print "temp="+temp
-        print "humid="+humid
+        print "vbat="+vbat
         
 
-        pushUrl = baseURL+'/input/'+str(publicKey)+'?private_key='+str(privateKey)+'&id='+id+'&temp='+temp+'&humid='+humid
+        pushUrl = baseURL+'/input/'+str(publicKey)+'?private_key='+str(privateKey)+'&id='+id+'&temp='+temp+'&humid='+vbat
          
         print pushUrl
          

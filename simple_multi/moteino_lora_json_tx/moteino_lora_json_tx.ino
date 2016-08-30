@@ -15,7 +15,7 @@
 #include <ArduinoJson.h>
 
 // Device ID
-#define DEVID 3
+#define DEVID 4
 
 /*
  SLEEP_15MS,
@@ -92,16 +92,14 @@ void loop()
   measuredvbat *= 2;    // we divided by 2, so multiply back
   measuredvbat *= 3.3;  // Multiply by 3.3V, our reference voltage
   measuredvbat /= 1024; // convert to voltage
-  measuredvbat = 6;
 
   StaticJsonBuffer<200> jsonBuffer;
   JsonObject& root = jsonBuffer.createObject();
   root["id"] = DEVID;
   root["millis"] = millis();
   JsonObject& data = root.createNestedObject("data");
-  //data["vbat"] = double_with_n_digits(measuredvbat, 3);
+  data["vbat"] = double_with_n_digits(measuredvbat, 3);
   data["temp"] = analogRead(A0);
-  data["humid"] = analogRead(A1);
 
   char buf[251];
   root.printTo(buf, sizeof(buf));
@@ -144,10 +142,12 @@ void loop()
     delay(200);
     digitalWrite(LED, LOW);
     
-
+  delay(8000);
+  /*
   //delay(8000);
   for (int i=0;i<8;i++) {
   LowPower.powerDown(SLEEP_8S, ADC_OFF, BOD_OFF);  
   }
+  */
   
 }

@@ -12,6 +12,25 @@
 #include <SPI.h>
 #include <RH_RF95.h>
 #include "LowPower.h"
+#include <ArduinoJson.h>
+
+// which analog pin to connect
+#define THERMISTORPIN A0         
+// resistance at 25 degrees C
+#define THERMISTORNOMINAL 10000      
+// temp. for nominal resistance (almost always 25 C)
+#define TEMPERATURENOMINAL 25   
+// how many samples to take and average, more takes longer
+// but is more 'smooth'
+#define NUMSAMPLES 5
+// The beta coefficient of the thermistor (usually 3000-4000)
+#define BCOEFFICIENT 3950
+// the value of the 'other' resistor
+#define SERIESRESISTOR 9800  
+#define RESOLUTION 1024
+
+// Device ID
+#define DEVID 9
 
 /*
  SLEEP_15MS,
@@ -31,7 +50,10 @@
 // Change to 434.0 or other frequency, must match RX's freq!
 //#define RF95_FREQ 915.0
 #define RF95_FREQ 868.0
- 
+
+ // for the thermistor 
+int samples[NUMSAMPLES];
+
 // Singleton instance of the radio driver
 //RH_RF95 rf95(RFM95_CS, RFM95_INT);
 RH_RF95 rf95;
@@ -41,6 +63,7 @@ RH_RF95 rf95;
 
 // Voltage PIN
 #define VBATPIN A7
+
 
 void setup() 
 {
@@ -81,31 +104,70 @@ int16_t packetnum = 0;  // packet counter, we increment per xmission
  
 void loop()
 { 
-  digitalWrite(LED, HIGH);
+
+  // make measurement
+
+  uint8_t i;
+  float average;
+ 
+  // take N samples in a row, with a slight delay
+  for (i=0; i< NUMSAMPLES; i++) {
+   samples[i] = analogRead(THERMISTORPIN);
+   delay(10);
+  }
+ 
+  // average all the samples out
+  average = 0;
+  for (i=0; i< NUMSAMPLES; i++) {
+     average += samples[i];
+  }
+  average /= NUMSAMPLES;
+ 
+  //Serial.print("Average analog reading "); 
+  //Serial.println(average);
+ 
+  // convert the value to resistance
+  average = (RESOLUTION-1) / average - 1;
+  average = SERIESRESISTOR / average;
+  //Serial.print("Thermistor resistance "); 
+  //Serial.println(average);
+ 
+  float steinhart;
+  steinhart = average / THERMISTORNOMINAL;     // (R/Ro)
+  steinhart = log(steinhart);                  // ln(R/Ro)
+  steinhart /= BCOEFFICIENT;                   // 1/B * ln(R/Ro)
+  steinhart += 1.0 / (TEMPERATURENOMINAL + 273.15); // + (1/To)
+  steinhart = 1.0 / steinhart;                 // Invert
+  steinhart -= 273.15;                         // convert to C
+ 
+  //Serial.print("Temperature "); 
+  Serial.print(steinhart);
+  //Serial.println(" *C");
+
+  float temp = steinhart;
+  
   Serial.println("Sending to rf95_server");
 
   float measuredvbat = analogRead(VBATPIN);
   measuredvbat *= 2;    // we divided by 2, so multiply back
   measuredvbat *= 3.3;  // Multiply by 3.3V, our reference voltage
   measuredvbat /= 1024; // convert to voltage
-  measuredvbat = 6;
-  
-  Serial.print("VBat: " ); Serial.println(measuredvbat);
 
-  measuredvbat *= 1000; // convert to voltage in thousandths
+  StaticJsonBuffer<200> jsonBuffer;
+  JsonObject& root = jsonBuffer.createObject();
+  root["id"] = DEVID;
+  root["millis"] = millis();
+  JsonObject& data = root.createNestedObject("data");
+  data["vbat"] = double_with_n_digits(measuredvbat, 3);
+  data["temp"] = double_with_n_digits(temp, 2);
 
-//  char charVal[10];  
-//  itoa((int)measuredvbat, charVal, 10);
-//  Serial.print("VBat: " ); Serial.println(charVal);
+  char buf[251];
+  root.printTo(buf, sizeof(buf));
+  buf[sizeof(buf)-1] = 0;
+  
+  Serial.print("Sending "); Serial.println(buf);
+  rf95.send((uint8_t *)buf, sizeof(buf));
 
-  char radiopacket[20] = "vbat:              ";
-  itoa((int)millis(), radiopacket+6, 10);
-  radiopacket[19] = 0;
-  Serial.print("Sending "); Serial.println(radiopacket);
-  
-  
-  Serial.println("Sending..."); delay(10);
-  rf95.send((uint8_t *)radiopacket, 20);
  
   Serial.println("Waiting for packet to complete..."); delay(10);
   rf95.waitPacketSent();
@@ -136,9 +198,16 @@ void loop()
   }
 */
 
+    digitalWrite(LED,HIGH);
+    delay(200);
     digitalWrite(LED, LOW);
-
-  delay(2000);
-  //LowPower.powerDown(SLEEP_8S, ADC_OFF, BOD_OFF);  
+    
+  delay(8000);
+  /*
+  //delay(8000);
+  for (int i=0;i<8;i++) {
+  LowPower.powerDown(SLEEP_8S, ADC_OFF, BOD_OFF);  
+  }
+  */
   
 }

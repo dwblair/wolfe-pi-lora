@@ -29,7 +29,7 @@
 #define SERIESRESISTOR 10000  
 #define RESOLUTION 4095
 
-#define DEVID 3
+#define DEVID 6
 
 
 /*
@@ -220,7 +220,7 @@ void loop()
     delay(200);
     digitalWrite(LED, LOW);
 
-  delay(2000);
+  delay(8000);
 //  LowPower.powerDown(SLEEP_8S, ADC_OFF, BOD_OFF);  
   
 }

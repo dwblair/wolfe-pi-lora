@@ -30,7 +30,7 @@
 #define RESOLUTION 1024
 
 // Device ID
-#define DEVID 9
+#define DEVID 8
 
 /*
  SLEEP_15MS,
